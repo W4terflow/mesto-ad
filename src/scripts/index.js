@@ -234,7 +234,7 @@ const handleLogoClick = () => {
       openModalWindow(usersStatsModalWindow);
     })
     .catch((err) => {
-      console.error("❌ Ошибка при загрузке статистики:", err);
+      console.error("Ошибка при загрузке статистики:", err);
       usersStatsModalTitle.textContent = "Ошибка";
       usersStatsModalText.textContent = "Не удалось загрузить статистику";
       openModalWindow(usersStatsModalWindow);
@@ -365,7 +365,7 @@ getUserInfo()
     }
   })
   .catch((err) => {
-    console.error("❌ Ошибка загрузки пользователя:", err);
+    console.error("Ошибка загрузки пользователя:", err);
     // Показываем сообщение пользователю
     profileTitle.textContent = "Ошибка загрузки";
     profileDescription.textContent = "Не удалось загрузить профиль";

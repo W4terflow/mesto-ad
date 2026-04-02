@@ -14,7 +14,7 @@ const config = {
 
 const getResponseData = (res) => {
   if (!res.ok) {
-    console.error('❌ Ошибка ответа:', res.status, res.statusText);
+    console.error('Ошибка ответа:', res.status, res.statusText);
     return Promise.reject(`Ошибка: ${res.status}`);
   }
   
