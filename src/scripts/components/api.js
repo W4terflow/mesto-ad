@@ -2,7 +2,7 @@ const isDev = import.meta.env.DEV;
 
 // Получаем токен и базовый URL
 const baseUrl = isDev ? '/api' : import.meta.env.VITE_API_BASE_URL;
-const token = import.meta.env.VITE_API_TOKEN;
+const token = import.meta.env.VITE_API_TOKEN // TODO будет убрано в релизе;
 
 const config = {
   baseUrl: baseUrl,
@@ -14,7 +14,6 @@ const config = {
 
 const getResponseData = (res) => {
   if (!res.ok) {
-    console.error('Ошибка ответа:', res.status, res.statusText);
     return Promise.reject(`Ошибка: ${res.status}`);
   }
   
