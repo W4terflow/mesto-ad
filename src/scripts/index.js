@@ -18,10 +18,19 @@ import {
   isCardLikedByUser,
   getLikesCount
 } from "./components/api.js";
+import { enableValidation, clearValidation } from "./components/validation.js";
 import { createCardElement } from "./components/card.js";
 import { openModalWindow, closeModalWindow, setCloseModalWindowEventListeners } from "./components/modal.js";
 
-console.log('Версия проекта: Release 1.0.1');
+console.log('Версия проекта: Release 1.0.2'); // Используется для проверки актуальности github pages
+
+enableValidation({
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+});
 
 // Глобальная переменная для хранения ID текущего пользователя
 let currentUserId = null;
@@ -61,11 +70,16 @@ const avatarFormModalWindow = document.querySelector(".popup_type_edit-avatar");
 const avatarForm = avatarFormModalWindow.querySelector(".popup__form");
 const avatarInput = avatarForm.querySelector(".popup__input");
 
-const usersStatsModalWindow = document.querySelector(".popup_type_info");
-const usersStatsModalTitle = usersStatsModalWindow.querySelector(".popup__title");
-const usersStatsModalInfoList = usersStatsModalWindow.querySelector(".popup__info");
-const usersStatsModalUserList = usersStatsModalWindow.querySelector(".popup__list");
-const usersStatsModalText = usersStatsModalWindow.querySelector(".popup__text");
+const usersStatsModalTitle = cardInfoModalWindow.querySelector(".popup__title");
+const usersStatsModalInfoList = cardInfoModalWindow.querySelector(".popup__info");
+const usersStatsModalUserList = cardInfoModalWindow.querySelector(".popup__list");
+const usersStatsModalText = cardInfoModalWindow.querySelector(".popup__text");
+
+// DOM элементы для удаления
+const removeCardModalWindow = document.querySelector(".popup_type_remove-card");
+const removeCardForm = removeCardModalWindow.querySelector(".popup__form");
+let cardToDeleteId = null;
+let cardToDeleteElement = null;
 
 // ========== ОБРАБОТЧИКИ ДЛЯ КАРТОЧЕК ==========
 
@@ -98,12 +112,31 @@ const handleLikeClick = (cardId, likeButton, likeCountElement, isLiked) => {
 };
 
 const handleDeleteCardClick = (cardId, cardElement) => {
-  deleteCard(cardId)
+  cardToDeleteId = cardId;
+  cardToDeleteElement = cardElement;
+  openModalWindow(removeCardModalWindow);
+};
+
+// Обработчик подтверждения удаления
+const handleRemoveCardSubmit = (evt) => {
+  evt.preventDefault();
+  const submitButton = evt.submitter;
+  const originalText = submitButton.textContent;
+  
+  submitButton.textContent = "Удаление...";
+  submitButton.disabled = true;
+  
+  deleteCard(cardToDeleteId)
     .then(() => {
-      cardElement.remove();
+      cardToDeleteElement.remove();
+      closeModalWindow(removeCardModalWindow);
     })
     .catch((err) => {
-      console.log("Ошибка при удалении карточки:", err);
+      // Здесь можно показать ошибку пользователю, но без console.log
+    })
+    .finally(() => {
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
     });
 };
 
@@ -171,7 +204,7 @@ const handleLogoClick = () => {
         usersStatsModalInfoList.innerHTML = '';
         usersStatsModalUserList.innerHTML = '';
         usersStatsModalText.textContent = "Нет созданных карточек";
-        openModalWindow(usersStatsModalWindow);
+        openModalWindow(cardInfoModalWindow);
         return;
       }
       
@@ -231,13 +264,13 @@ const handleLogoClick = () => {
       });
       
       // Открываем модальное окно
-      openModalWindow(usersStatsModalWindow);
+      openModalWindow(cardInfoModalWindow);
     })
     .catch((err) => {
       console.error("Ошибка при загрузке статистики:", err);
       usersStatsModalTitle.textContent = "Ошибка";
       usersStatsModalText.textContent = "Не удалось загрузить статистику";
-      openModalWindow(usersStatsModalWindow);
+      openModalWindow(cardInfoModalWindow);
     });
 };
 
@@ -280,7 +313,7 @@ const handleProfileFormSubmit = (evt) => {
       closeModalWindow(profileFormModalWindow);
     })
     .catch((err) => {
-      console.log("Ошибка при обновлении профиля:", err);
+      // console.log("Ошибка при обновлении профиля:", err);
     })
     .finally(() => {
       submitButton.textContent = originalText;
@@ -303,7 +336,7 @@ const handleAvatarFormSubmit = (evt) => {
       closeModalWindow(avatarFormModalWindow);
     })
     .catch((err) => {
-      console.log("Ошибка при обновлении аватара:", err);
+      // console.log("Ошибка при обновлении аватара:", err);
     })
     .finally(() => {
       submitButton.textContent = originalText;
@@ -341,7 +374,7 @@ const handleCardFormSubmit = (evt) => {
       cardForm.reset();
     })
     .catch((err) => {
-      console.log("Ошибка при добавлении карточки:", err);
+      // console.log("Ошибка при добавлении карточки:", err);
     })
     .finally(() => {
       submitButton.textContent = originalText;
@@ -405,10 +438,18 @@ profileForm.addEventListener("submit", handleProfileFormSubmit);
 cardForm.addEventListener("submit", handleCardFormSubmit);
 avatarForm.addEventListener("submit", handleAvatarFormSubmit);
 logo.addEventListener("click", handleLogoClick);
+removeCardForm.addEventListener("submit", handleRemoveCardSubmit);
 
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;
   profileDescriptionInput.value = profileDescription.textContent;
+  clearValidation(profileForm, {
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+  });
   openModalWindow(profileFormModalWindow);
 });
 

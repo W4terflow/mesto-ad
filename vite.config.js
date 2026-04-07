@@ -17,7 +17,7 @@ export default defineConfig({
             // Заменяем /api на /v1/apf-cohort-202
             const newUrl = originalUrl.replace('/api', '/v1/apf-cohort-202');
             proxyReq.path = newUrl;
-            console.log('🔄 Прокси:', originalUrl, '->', newUrl);
+            // console.log('🔄 Прокси:', originalUrl, '->', newUrl); // можно раскомментировать для дебага запросов
           });
         },
       },

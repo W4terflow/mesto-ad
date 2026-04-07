@@ -2,7 +2,7 @@ const isDev = import.meta.env.DEV;
 
 // Получаем токен и базовый URL
 const baseUrl = isDev ? '/api' : import.meta.env.VITE_API_BASE_URL;
-const token = import.meta.env.VITE_API_TOKEN // TODO будет убрано в релизе;
+const token = import.meta.env.VITE_API_TOKEN
 
 const config = {
   baseUrl: baseUrl,
@@ -76,7 +76,7 @@ export const getCardList = () => {
   // Создаем AbortController для управления запросом
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
-    console.log('[getCardList] Таймаут запроса');
+    // console.log('[getCardList] Таймаут запроса');
     controller.abort();
   }, 10000); // 10 секунд таймаут
   
