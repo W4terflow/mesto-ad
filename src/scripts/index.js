@@ -384,31 +384,25 @@ const handleCardFormSubmit = (evt) => {
 
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 
-// Загружаем данные пользователя
-getUserInfo()
-  .then((userData) => {
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+
+// Загружаем данные пользователя и карточки параллельно, но ждём оба запроса
+Promise.all([getUserInfo(), getCardList()])
+  .then(([userData, cards]) => {
+    // 1. Сохраняем ID пользователя
     currentUserId = userData._id;
     
-    // Обновляем DOM
+    // 2. Обновляем DOM профиля
     profileTitle.textContent = userData.name;
     profileDescription.textContent = userData.about;
     
     if (profileAvatar) {
       profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
     }
-  })
-  .catch((err) => {
-    console.error("Ошибка загрузки пользователя:", err);
-    // Показываем сообщение пользователю
-    profileTitle.textContent = "Ошибка загрузки";
-    profileDescription.textContent = "Не удалось загрузить профиль";
-  });
-
-// Загружаем карточки
-getCardList()
-  .then((cards) => {
+    
+    // 3. Теперь, когда currentUserId известен, отрисовываем карточки
     if (cards && cards.length > 0) {
-      cards.forEach((card, index) => {
+      cards.forEach((card) => {
         renderCard(card);
       });
     } else {
@@ -420,9 +414,11 @@ getCardList()
       placesWrap.appendChild(emptyMessage);
     }
   })
-  .catch((err) => {
-    console.error("Ошибка загрузки карточек:", err);
-    // Показываем сообщение об ошибке
+  .catch(() => {
+    // Обработка ошибок (без console.log)
+    profileTitle.textContent = "Ошибка загрузки";
+    profileDescription.textContent = "Не удалось загрузить профиль";
+    
     const errorMessage = document.createElement('li');
     errorMessage.textContent = 'Не удалось загрузить карточки. Проверьте подключение.';
     errorMessage.style.color = 'red';
@@ -430,7 +426,6 @@ getCardList()
     errorMessage.style.padding = '40px';
     placesWrap.appendChild(errorMessage);
   });
-
 
 // ========== НАСТРОЙКА ОБРАБОТЧИКОВ СОБЫТИЙ ==========
 
